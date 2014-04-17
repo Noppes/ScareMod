@@ -1,0 +1,6 @@
+{
+  "scare.spooky": {
+    "category": "player",
+    "sounds": ["spooky"]
+  }
+}

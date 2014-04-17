@@ -7,7 +7,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatMessageComponent;
+import net.minecraft.util.ChatComponentText;
 
 public class CommandScare extends CommandBase{
 	private Random random = new Random();
@@ -27,7 +27,7 @@ public class CommandScare extends CommandBase{
 			return;
 		EntityPlayerMP player = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(var2[0]);
 		if(player == null){
-			var1.sendChatToPlayer(ChatMessageComponent.createFromText("Unknown user"));
+			var1.addChatMessage(new ChatComponentText("Unknown user"));
 			return;
 		}
 		Server.sendData(player);

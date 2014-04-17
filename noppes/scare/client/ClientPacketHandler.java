@@ -1,40 +1,42 @@
 package noppes.scare.client;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.zip.GZIPInputStream;
+import io.netty.buffer.ByteBufInputStream;
 
-import org.apache.commons.lang3.text.translate.NumericEntityUnescaper.OPTION;
+import java.io.IOException;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.EnumOptions;
+import net.minecraft.client.audio.SoundCategory;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet250CustomPayload;
-import cpw.mods.fml.common.network.IPacketHandler;
-import cpw.mods.fml.common.network.Player;
+import net.minecraft.init.Blocks;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 
-public class ClientPacketHandler implements Runnable, IPacketHandler{
+public class ClientPacketHandler implements Runnable{
 	private float master, players;
 	public static boolean playing = false;
-
-
-	@Override
-	public void onPacketData(INetworkManager manager,
-			Packet250CustomPayload packet, Player p) {
+	@SubscribeEvent
+	public void onPacketData(ClientCustomPacketEvent event) {
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayer player = mc.thePlayer;
-		if(!playing){
-			master = mc.gameSettings.getOptionFloatValue(EnumOptions.SOUND);
+		ByteBufInputStream buf = new ByteBufInputStream(event.packet.payload());
+		try {
+			if(!playing){
+				master = mc.gameSettings.getSoundLevel(SoundCategory.MASTER);
+				players = mc.gameSettings.getSoundLevel(SoundCategory.PLAYERS);
+			}
+			mc.gameSettings.setSoundLevel(SoundCategory.MASTER, 1);
+			mc.gameSettings.setSoundLevel(SoundCategory.PLAYERS, 1);
+			playing = true;
+			player.playSound("scare:scare.spooky", 1, 1);
+			//player.worldObj.playSoundAtEntity(player, sound,  1, 1);
+			Thread thread = new Thread(this);
+			thread.start();
+			buf.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		mc.gameSettings.setOptionFloatValue(EnumOptions.SOUND, 1);
-		playing = true;
-		player.playSound("scare:spooky", 1, 1);
-		//player.worldObj.playSoundAtEntity(player, "scare:scare.spooky",  1, 1);
-		Thread thread = new Thread(this);
-		thread.start();
+		
 	}
 
 	@Override
@@ -46,7 +48,8 @@ public class ClientPacketHandler implements Runnable, IPacketHandler{
 			e.printStackTrace();
 		}
 		Minecraft mc = Minecraft.getMinecraft();
-		mc.gameSettings.setOptionFloatValue(EnumOptions.SOUND, master);
+		mc.gameSettings.setSoundLevel(SoundCategory.MASTER, master);
+		mc.gameSettings.setSoundLevel(SoundCategory.PLAYERS, players);
 		playing = false;
 	}
 }
