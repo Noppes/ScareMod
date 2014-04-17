@@ -1,0 +1,16 @@
+[
+{
+  "modid": "scare",
+  "name": "Scare",
+  "description": "Mod originally made for youtube.com/user/Bodil40",
+  "version": "1.6.4",
+  "mcversion": "1.6.4",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Noppes"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
